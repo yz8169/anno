@@ -1,0 +1,166 @@
+@()(implicit request: RequestHeader)
+@main("拆分数据")("splitData") {
+	<div class="page-content">
+
+		<div class="page-bar">
+			<ul class="page-breadcrumb">
+
+				<li>
+					<i class="fa fa-anchor"></i>
+					<a href="#">拆分数据</a>
+				</li>
+
+			</ul>
+		</div>
+
+
+		<div class="row-fluid">
+			<div class="row">
+				<div class="col-md-12 col-sm-12">
+					<div class="portlet blue-madison box">
+						<div class="portlet-title">
+							<div class="caption">
+								拆分数据
+							</div>
+						</div>
+
+						<div class="portlet-body">
+
+							<form class="registration-form form-horizontal" id="form"
+							accept-charset="UTF-8" method="post">
+
+								<div class="form-group">
+									<label class="control-label col-sm-2">序列文件:</label>
+									<div class="col-sm-8">
+										<input id="input-1" type="file" class="file control-label" name="file" data-show-preview="false"
+										data-show-upload="false" accept=".fa,.fasta">
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label class="control-label col-sm-2">单文件序列条数:</label>
+									<div class="col-sm-2">
+										<input class="form-control" name="seqNum" id="evalue" value="2000">
+									</div>
+								</div>
+
+
+								<div class="form-group">
+									<div class="actions col-sm-offset-2 col-sm-2">
+										<button type="button" class="btn btn-primary" style="width: 90%;" id="search" onclick="mySearch()">
+											运行</button>
+									</div>
+								</div>
+
+
+							</form>
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+
+	</div>
+
+
+	<script>
+			$(function () {
+				bootstrapValidator()
+
+			})
+
+			$("#input-1").fileinput({
+				showPreview: false,
+				browseLabel: "选择...",
+				removeLabel: "删除文件",
+				language: "zh"
+			});
+
+			function mySearch() {
+				var form = $("#form")
+				var fv = form.data("bootstrapValidator")
+				fv.validate()
+				if (fv.isValid()) {
+					var element = "<div id='content'><span id='info'>" + zhRunning + "</span>&nbsp;<img class='runningImage' src='@routes.Assets.at("images/running2.gif")' style='width: 30px;height: 20px;'></div>"
+					var index = layer.alert(element, {
+						skin: 'layui-layer-molv'
+						, closeBtn: 0,
+						title: zhInfo,
+						btn: []
+					});
+					var form1 = new FormData($("#form")[0])
+					$.ajax({
+						url: "@routes.LoadDataController.splitData()",
+						type: "post",
+						processData: false,
+						contentType: false,
+						data: form1,
+						success: function (data) {
+							layer.close(index)
+							if (data.valid == "false") {
+								swal("Error", data.message, "error")
+							} else {
+								var zip = new JSZip()
+								zip.loadAsync(data, {base64: true}).then(function (zip) {
+									zip.generateAsync({type: "blob"}).then(function (content) {
+										saveAs(content, "result.zip")
+									})
+								})
+
+							}
+						}
+					});
+				}
+			}
+
+
+			function bootstrapValidator() {
+				var infinityNumber = Number.MAX_VALUE
+				$('#form').bootstrapValidator({
+					framework: 'bootstrap',
+					icon: {
+						valid: 'glyphicon glyphicon-ok',
+						invalid: 'glyphicon glyphicon-remove',
+						validating: 'glyphicon glyphicon-refresh'
+					},
+					fields: {
+						file: {
+							validators: {
+								notEmpty: {
+									message: '请选择一个序列文件！'
+								},
+								file: {
+									extension: 'fa,fasta',
+									message: '请选择一个fasta格式的序列文件！'
+								}
+							}
+						},
+						seqNum: {
+							validators: {
+								notEmpty: {
+									message: '单文件序列条数不能为空！'
+								},
+								integer: {
+									message: '单文件序列条数必须为整数！'
+								},
+								between: {
+									min: "1",
+									max: infinityNumber,
+									inclusive: false,
+									message: "单文件序列条数必须大于1！"
+								}
+
+							}
+						},
+
+					}
+				});
+
+			}
+	</script>
+
+
+}

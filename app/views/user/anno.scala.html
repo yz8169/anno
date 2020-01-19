@@ -1,0 +1,536 @@
+@()(implicit request: RequestHeader)
+	@main("运行注释")("anno") {
+		<style>
+				.helpIcon {
+					color: white;
+					font-size: 16px;
+				}
+
+				.btn-remove {
+					float: right;
+					background-color: transparent;
+					border: none;
+				}
+
+				.close {
+					display: none;
+					margin-top: 0px;
+					margin-right: 0px;
+					width: 9px;
+					height: 9px;
+					background-repeat: no-repeat !important;
+					text-indent: -10000px;
+					outline: none;
+					background-image: url("/assets/images/remove-icon-small.png") !important;
+				}
+
+				.modal-body {
+					overflow-y: scroll;
+					max-height: 650px;
+				}
+				.helpClass {
+					font-size: 14px;
+					text-indent: 2em;
+				}
+		</style>
+		<div class="page-content">
+
+			<div class="page-bar">
+				<ul class="page-breadcrumb">
+					<li>
+						<i class="fa fa fa-bar-chart"></i>
+						<a href="">运行注释</a>
+					</li>
+				</ul>
+			</div>
+
+
+			<div class="row-fluid">
+				<div class="row">
+					<div class="col-md-12 col-sm-12">
+						<div class="portlet blue-madison box">
+							<div class="portlet-title">
+								<div class="caption">
+									运行注释 &nbsp;<a onclick="openHelp1()" title="帮助文档" class="helpIcon" >
+									<i class="fa fa-question-circle-o"></i></a>
+								</div>
+							</div>
+
+							<div class="portlet-body">
+
+								<form class="registration-form form-horizontal" id="form"
+								accept-charset="UTF-8" method="post">
+
+									<div class="form-group">
+										<label class="control-label col-sm-2">任务名 :</label>
+										<div class="col-sm-3">
+											<input class="form-control" value="" name="missionName" id="missionName">
+										</div>
+									</div>
+
+									<div class="form-group">
+										<label class="control-label col-sm-2">选择样品 :</label>
+										<div class="col-sm-3">
+											<select class="form-control sampleName" name="sampleName" id="sampleName">
+
+											</select>
+										</div>
+									</div>
+
+									<div class="form-group">
+										<label class="control-label col-sm-2">注释类型:</label>
+										<div class="col-sm-3">
+											<div class="checkbox">
+												<label style="margin-right: 15px;
+													padding-top: 7px;"><input name="annoMethods[]" onchange="myNr(this)" type="checkbox" checked value="nr">
+													NR注释</label>
+												<label style="margin-right: 15px;
+													padding-top: 7px;"><input name="annoMethods[]" onchange="myGo(this)" type="checkbox" checked value="go">
+													GO注释</label>
+												<label style="margin-right: 15px;
+													padding-top: 7px;">
+													<input name="annoMethods[]" onchange="myKegg(this)" type="checkbox" checked value="kegg">
+													KEGG注释</label>
+												<label style="margin-right: 15px;
+													padding-top: 7px;">
+													<input name="annoMethods[]" onchange="myEggNOG(this)" type="checkbox" checked value="cog">
+													COG注释</label>
+												<label style="margin-right: 15px;
+													padding-top: 7px;"><input name="annoMethods[]" onchange="mySwiss(this)" type="checkbox" checked value="swiss">
+													Swissprot注释</label>
+											</div>
+										</div>
+									</div>
+
+									<div class="form-group">
+										<label class="control-label col-sm-2">物种类型:</label>
+										<div class="col-sm-3">
+											<select class="form-control" name="dbType" id="db">
+												<option>Animals</option>
+												<option>Archaea</option>
+												<option>Bacteria</option>
+												<option>Fungi</option>
+												<option>Plants</option>
+												<option>Viruses</option>
+												<option>all</option>
+											</select>
+										</div>
+									</div>
+
+									<div id="kegg">
+										<h4 class="col-sm-offset-1">KEGG注释参数</h4>
+										<div class="form-group">
+											<label class="control-label col-sm-2">Blast e-value cutoff:</label>
+											<div class="col-sm-2">
+												<input class="form-control" name="eValue" id="evalue" value="1e-5">
+											</div>
+
+											<label class="control-label col-sm-2">Blast max target seqs:</label>
+											<div class="col-sm-2">
+												<input class="form-control" name="maxTargetSeqs" id="mCharacteristic" value="5">
+											</div>
+										</div>
+									</div>
+
+									<div id="eggNOG">
+										<h4 class="col-sm-offset-1">eggNOG注释参数</h4>
+										<div class="form-group">
+											<label class="control-label col-sm-2">Blast e-value cutoff:</label>
+											<div class="col-sm-2">
+												<input class="form-control" name="eggEValue" id="evalue" value="1e-5">
+											</div>
+
+											<label class="control-label col-sm-2">Blast max target seqs:</label>
+											<div class="col-sm-2">
+												<input class="form-control" name="eggMaxTargetSeqs" id="mCharacteristic" value="5">
+											</div>
+										</div>
+									</div>
+
+									<div id="nr">
+										<h4 class="col-sm-offset-1">NR注释参数</h4>
+										<div class="form-group">
+											<label class="control-label col-sm-2">Blast e-value cutoff:</label>
+											<div class="col-sm-2">
+												<input class="form-control" name="nrEValue" id="evalue" value="1e-5">
+											</div>
+
+											<label class="control-label col-sm-2">Blast max target seqs:</label>
+											<div class="col-sm-2">
+												<input class="form-control" name="nrMaxTargetSeqs" id="mCharacteristic" value="5">
+											</div>
+										</div>
+									</div>
+
+									<div id="swiss">
+										<h4 class="col-sm-offset-1">Swissprot注释参数</h4>
+										<div class="form-group">
+											<label class="control-label col-sm-2">Blast e-value cutoff:</label>
+											<div class="col-sm-2">
+												<input class="form-control" name="swissEValue" id="evalue" value="1e-5">
+											</div>
+
+											<label class="control-label col-sm-2">Blast max target seqs:</label>
+											<div class="col-sm-2">
+												<input class="form-control" name="swissMaxTargetSeqs" id="mCharacteristic" value="5">
+											</div>
+										</div>
+									</div>
+
+									<div class="form-group">
+										<div class="actions col-sm-offset-2 col-sm-3">
+											<button type="button" class="btn btn-primary" style="width: 90%;" id="search" onclick="mySearch()">
+												运行</button>
+										</div>
+									</div>
+
+
+								</form>
+
+
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+
+
+			<div id="helpShow1" class="modal fade modal-margin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog" style="width: 1000px;">
+					<div class="modal-content">
+						<div class="modal-header bg-primary">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+							<h4 class="modal-title">
+								<span id="lblAddTitle" style="font-weight: bold">帮助文档：</span>
+								<button type="button" class="btn-remove" data-dismiss="modal" ><i class="fa fa-remove"></i></button>
+							</h4>
+						</div>
+						<div class="modal-body">
+							<div class="row-fluid" id="logInfo">
+								<p class="helpClass">
+									<b>NR数据库</b>
+									：非冗余蛋白质的氨基酸序列数据库，包含了SwissProt、PIR（Protein Information Resource）、PRF（Protein Research Foundation）、PDB（Protein Data Bank）蛋白质数据库非冗余的数据以及从GenBank 和RefSeq 的CDS 数据翻译来的蛋白质数据。
+								</p>
+								<p class="helpClass">
+									<b>GO数据库</b>：
+									GO是基因本体论Gene Ontology的缩写（详情请见：<a href="http://www.geneontology.org/" target="_blank">
+									http://www.geneontology.org/</a>
+									）。由于不同物种、不同数据库中的关于基因和基因产物等生物学术语的描述存在差异，当查询某个研究领域的相关信息时，生物学家需要花费大量的时间和精力去分析生物学术语之间的联系，而Gene Ontology项目的目的就是为了标准化这些生物学术语，方便生物学家之间的相互交流。GO注释包括3个方面的内容：
+							<p class="helpClass">
+								Cellular component：the parts of a cell or its extracellular environment;
+							</p>
+								<p class="helpClass">
+									Molecular function：the elemental activities of a gene product at the molecular level, such as binding or catalysis;
+
+								</p>
+								<p class="helpClass">
+									Biological process：operations or sets of molecular events with a defined beginning and end, pertinent to the functioning of integrated living units: cells, tissues, organs, and organisms.
+								</p>
+								<p class="helpClass">
+									因此，GO注释更加便于我们理解基因背后所代表的生物学意义。通过blast2go软件对blast结果进行了GO注释分析
+								</p>
+								<br>
+								<p class="helpClass">
+									<b>KEGG数据库</b>：
+									KEGG（Kyoto Encyclopedia of Genes and Genomes，京都基因和基因组百科全书，<a target="_blank" href="http://www.genome.jp/kegg/">
+									http://www.genome.jp/kegg/</a>
+									是基因组研究方面的公共数据库。该数据库是系统分析基因功能，联系基因组信息和功能信息的大型知识库。KEGG将从NCBI等数据库中获得的包括完整和部分测序的基因组序列及其基因序列存储于KEGG genes数据库中；将各种生物学通路信息存储在PATHWAY数据库中，包括各种代谢通路、合成通路、膜转运、信号传递、细胞周期以及疾病相关通路等。此外，KEGG LIGAND数据库中也收集了各种化学分子、酶以及酶促反应等相关信息。
+								</p>
+								<p class="helpClass">
+									在生物体内，基因产物并不是孤立存在而各自发挥作用的，不同基因产物之间通过有序的相互协调来一起行使具体的生物学功能。因此，KEGG数据库中丰富的通路信息将有助于我们从系统水平去了解基因的生物学功能，例如代谢途径、遗传信息传递以及细胞学过程等一些复杂的生物过程。
+								</p>
+								<p class="helpClass">
+									运用BLAST算法将所获得的预测基因与KEGG的基因数据库(Genes)进行比对，根据比对得到的KO编号可以获得相应基因参与的具体生物学通路。
+								</p>
+								<br>
+								<p class="helpClass">
+									<b>COG数据库</b>：
+									COG是Clusters of Orthologous Groups of proteins的缩写(<a target="_blank" href="http://www.ncbi.nlm.nih.gov/COG/">
+									http://www.ncbi.nlm.nih.gov/COG/</a>
+									)。COG是在对已完成基因组测序的物种的蛋白质序列进行相互比较的基础上构建的，COG数据库选取的物种包括各个主要的系统进化谱系。每个COG家族至少由来自3个系统进化谱系的物种的蛋白所组成，所以一个COG对应于一个古老的保守结构域。构成每个COG的蛋白被假定来自于同一个祖先蛋白。进行COG数据库比对可以对预测蛋白进行功能注释、归类以及蛋白进化分析。
+								</p>
+								<p class="helpClass">
+									通过与string数据库进行blast比对，可以获得基因所对应的COG注释结果，并根据COG 注释结果对蛋白进行功能归类，
+								</p>
+								<br>
+								<p class="helpClass">
+									<b>SwissProt数据库</b>：
+									Swiss-Prot,是2002年由 UniProt  consortium 建立的基因数据库，其特点在注释结果经过实验验证，可靠性较高，可用作其他数据的参考。
+								</p>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+
+		<script>
+				function myKegg(element) {
+					if ($(element).is(":checked")) {
+						$('#kegg').show()
+					} else {
+						$('#kegg').hide()
+					}
+				}
+
+				function openHelp1() {
+					$("#helpShow1").modal("show")
+				}
+
+				function myEggNOG(element) {
+					if ($(element).is(":checked")) {
+						$('#eggNOG').show()
+					} else {
+						$('#eggNOG').hide()
+					}
+				}
+
+				function myNr(element) {
+					if ($(element).is(":checked")) {
+						$('#nr').show()
+					} else {
+						$('#nr').hide()
+						$("input[value='go']").attr("checked", false).trigger("change")
+					}
+				}
+
+				function mySwiss(element) {
+					if ($(element).is(":checked")) {
+						$('#swiss').show()
+					} else {
+						$('#swiss').hide()
+					}
+				}
+
+				function myGo(element) {
+					if ($(element).is(":checked")) {
+						$("input[value='nr']").attr("checked", true).trigger("change")
+					}
+				}
+
+				$(function () {
+					var time = getCurrentTime()
+					$("#missionName").val(time)
+
+					$.ajax({
+						url: "@routes.SampleManageController.getAllSample()",
+						type: "get",
+						dataType: "json",
+						success: function (data) {
+							var sampleNames = $.map(data, function (v) {
+								return v.samplename
+							})
+							$(".sampleName").select2({
+								data: sampleNames,
+								minimumResultsForSearch: -1
+							})
+						}
+					})
+
+					bootstrapValidator()
+				})
+
+				function mySearch() {
+					var form = $("#form")
+					var fv = form.data("bootstrapValidator")
+					fv.validate()
+					if (fv.isValid()) {
+						var element = "<div id='content'><span id='info'>正在运行...</span>&nbsp;<img class='runningImage' src='/assets/images/running2.gif' style='width: 30px;height: 20px;'></div>"
+						var index = layer.alert(element, {
+							skin: 'layui-layer-molv'
+							, closeBtn: 0,
+							title: "信息",
+							btn: []
+						});
+						$.ajax({
+							url: "@routes.AnnoController.anno()",
+							type: "post",
+							data: $("#form").serialize(),
+							success: function (data) {
+								layer.close(index)
+								if (data.valid == "false") {
+									swal("错误", data.message, "error")
+								} else {
+									window.location.href = "@routes.AnnoController.annoResult()"
+								}
+
+							}
+						});
+					}
+
+				}
+
+				function bootstrapValidator() {
+					var infinityNumber = Number.MAX_VALUE
+					$('#form').bootstrapValidator({
+						framework: 'bootstrap',
+						icon: {
+							valid: 'glyphicon glyphicon-ok',
+							invalid: 'glyphicon glyphicon-remove',
+							validating: 'glyphicon glyphicon-refresh'
+						},
+						fields: {
+							missionName: {
+								validators: {
+									notEmpty: {
+										message: '任务名不能为空！'
+									},
+								}
+							},
+							sampleName: {
+								validators: {
+									callback: {
+										message: '请至少选择一个样品！',
+										callback: function (value, validator, $field) {
+											var options = validator.getFieldElements('sampleName').val();
+											return (options != null);
+										}
+									}
+								}
+							},
+							'annoMethods[]': {
+								validators: {
+									choice: {
+										min: 1,
+										message: '至少选择一种注释方法！'
+									}
+								}
+							},
+
+							eValue: {
+								validators: {
+									notEmpty: {
+										message: 'Evalue不能为空！'
+									},
+									numeric: {
+										message: 'Evalue必须为数字！'
+									},
+									between: {
+										min: "0",
+										max: infinityNumber,
+										message: "Evalue必须大于等于0！"
+									}
+								}
+							},
+							maxTargetSeqs: {
+								validators: {
+									notEmpty: {
+										message: 'Max target seqs不能为空！'
+									},
+									integer: {
+										message: 'Max target seqs必须为整数！'
+									},
+									between: {
+										min: "0",
+										max: infinityNumber,
+										message: "Max target seqs必须大于等于0！"
+									}
+								}
+							},
+							eggEValue: {
+								validators: {
+									notEmpty: {
+										message: 'Evalue不能为空！'
+									},
+									numeric: {
+										message: 'Evalue必须为数字！'
+									},
+									between: {
+										min: "0",
+										max: infinityNumber,
+										message: "Evalue必须大于等于0！"
+									}
+								}
+							},
+							eggMaxTargetSeqs: {
+								validators: {
+									notEmpty: {
+										message: 'Max target seqs不能为空！'
+									},
+									integer: {
+										message: 'Max target seqs必须为整数！'
+									},
+									between: {
+										min: "0",
+										max: infinityNumber,
+										message: "Max target seqs必须大于等于0！"
+									}
+								}
+							},
+							nrEValue: {
+								validators: {
+									notEmpty: {
+										message: 'Evalue不能为空！'
+									},
+									numeric: {
+										message: 'Evalue必须为数字！'
+									},
+									between: {
+										min: "0",
+										max: infinityNumber,
+										message: "Evalue必须大于等于0！"
+									}
+								}
+							},
+							nrMaxTargetSeqs: {
+								validators: {
+									notEmpty: {
+										message: 'Max target seqs不能为空！'
+									},
+									integer: {
+										message: 'Max target seqs必须为整数！'
+									},
+									between: {
+										min: "0",
+										max: infinityNumber,
+										message: "Max target seqs必须大于等于0！"
+									}
+								}
+							},
+							swissEValue: {
+								validators: {
+									notEmpty: {
+										message: 'Evalue不能为空！'
+									},
+									numeric: {
+										message: 'Evalue必须为数字！'
+									},
+									between: {
+										min: "0",
+										max: infinityNumber,
+										message: "Evalue必须大于等于0！"
+									}
+								}
+							},
+							swissMaxTargetSeqs: {
+								validators: {
+									notEmpty: {
+										message: 'Max target seqs不能为空！'
+									},
+									integer: {
+										message: 'Max target seqs必须为整数！'
+									},
+									between: {
+										min: "0",
+										max: infinityNumber,
+										message: "Max target seqs必须大于等于0！"
+									}
+								}
+							},
+						}
+					});
+				}
+
+
+
+
+
+		</script>
+
+
+	}

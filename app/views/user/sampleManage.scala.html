@@ -1,0 +1,221 @@
+@()(implicit request: RequestHeader)
+@main("样品管理")("sampleManage") {
+	<div class="page-content">
+
+		<div class="page-bar">
+			<ul class="page-breadcrumb">
+				<li>
+					<i class="fa fa fa-bar-chart"></i>
+					<a href="">样品管理</a>
+				</li>
+			</ul>
+		</div>
+
+
+		<div class="row-fluid">
+			<div class="row">
+				<div class="col-md-12 col-sm-12">
+					<div class="portlet blue-madison box">
+						<div class="portlet-title">
+							<div class="caption">
+								样品管理
+							</div>
+						</div>
+
+						<div class="portlet-body">
+							<div class="table-responsive">
+
+								<table class="display table table-bordered" id="table" data-pagination="true" data-search="true"
+								data-toolbar="#toolbar" data-page-list="[10, 25, 50, 100, all]" data-multiple-search="true">
+									<thead>
+										<tr>
+											<th data-field="samplename" data-sortable="true">样品名</th>
+											<th data-field="max" data-sortable="true">最大序列长度（bp）</th>
+											<th data-field="min" data-sortable="true">最小序列长度（bp）</th>
+											<th data-field="mean" data-sortable="true">平均序列长度（bp）</th>
+											<th data-field="size" data-sortable="true">序列条数</th>
+											<th data-field="kind" data-sortable="true">类型</th>
+											<th data-field="describe" data-sortable="true">描述</th>
+											<th data-field="uploadtime" data-sortable="true">上传时间</th>
+											<th data-field="operate">操作</th>
+										</tr>
+									</thead>
+								</table>
+
+								<div id="updateModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+									<div class="modal-dialog" style="width: 650px">
+										<div class="modal-content">
+											<div class="modal-header bg-primary">
+												<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+												<h4 class="modal-title">
+													<i class="fa fa-edit"></i>
+													<span id="lblAddTitle" style="font-weight: bold">修改描述</span>
+												</h4>
+											</div>
+											<form class="form-horizontal" id="updateForm" action="" data-toggle="validator">
+												<div class="modal-body">
+													<div class="row-fluid">
+
+														<div class="form-group">
+															<label class="control-label col-sm-2">描述:</label>
+															<div class="col-sm-8">
+																<textarea name="describe" id="describe" class="form-control" rows="5"></textarea>
+															</div>
+														</div>
+
+													</div>
+												</div>
+												<div class="modal-footer bg-info">
+													<input type="hidden" id="id" name="id" />
+													<button type="button" class="btn blue" onclick="changeDescribe()">
+														确定</button>
+													<button type="button" class="btn green" data-dismiss="modal">
+														取消</button>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+
+	</div>
+
+
+	<script>
+			$(function () {
+
+				$.ajax({
+					url: "@routes.SampleManageController.getAllSample()",
+					type: "get",
+					dataType: "json",
+					success: function (data) {
+						$('#table').bootstrapTable({
+							data: data
+						});
+					}
+				})
+
+				formValidation()
+
+				$("#updateModal").on('hide.bs.modal', function () {
+					$("#updateForm").data("formValidation").resetForm(true)
+				})
+
+			})
+
+			function changeDescribe() {
+				var form = $("#updateForm")
+				var fv = form.data("formValidation")
+				fv.validate()
+				if (fv.isValid()) {
+					$.ajax({
+						url: "@routes.SampleManageController.updateDescribe()",
+						type: "post",
+						data: $("#updateForm").serialize(),
+						success: function (data) {
+							$("#updateModal").modal("hide")
+							fv.resetForm(true)
+							swal("成功！", "修改成功！", "success")
+							$('#table').bootstrapTable("load", data);
+						}
+					});
+				}
+			}
+
+
+			function deleteSample(id) {
+				swal({
+							title: "",
+							text: "确定要删除此数据吗？",
+							type: "warning",
+							showCancelButton: true,
+							showConfirmButton: true,
+							confirmButtonClass: "btn-danger",
+							confirmButtonText: "确定",
+							closeOnConfirm: false,
+							cancelButtonText: "取消"
+						},
+						function () {
+							$.ajax({
+								url: "deleteSampleById?id=" + id,
+								type: "get",
+								success: function (data) {
+									$('#table').bootstrapTable("load", data);
+									swal("成功！", "删除成功！", "success")
+								}
+							});
+						});
+			}
+
+			function switchKind(id) {
+				swal({
+							title: "",
+							text: "确定要变更此数据类型（核酸改蛋白，蛋白改核酸）吗？",
+							type: "warning",
+							showCancelButton: true,
+							showConfirmButton: true,
+							confirmButtonClass: "btn-danger",
+							confirmButtonText: "确定",
+							closeOnConfirm: false,
+							cancelButtonText: "取消"
+						},
+						function () {
+							$.ajax({
+								url: "switchKindById?id=" + id,
+								type: "get",
+								success: function (data) {
+									$('#table').bootstrapTable("load", data);
+									swal("成功！", "类型变更成功！", "success")
+								}
+							});
+						});
+			}
+
+			function formValidation() {
+				$('#updateForm').formValidation({
+					framework: 'bootstrap',
+					icon: {
+						valid: 'glyphicon glyphicon-ok',
+						invalid: 'glyphicon glyphicon-remove',
+						validating: 'glyphicon glyphicon-refresh'
+					},
+					fields: {
+						describe: {
+							validators: {
+								notEmpty: {
+									message: '描述不能为空！'
+								},
+							}
+						},
+					}
+				});
+			}
+
+			function updateDescribe(id) {
+				$.ajax({
+					url: "getSampleById?id=" + id,
+					type: "get",
+					success: function (data) {
+						$("#id").val(data.id)
+						$("#describe").val(data.describe)
+						$("#updateModal").modal("show")
+						$("#updateForm").formValidation('revalidateField', 'describe')
+					}
+				});
+			}
+
+
+
+	</script>
+
+
+}

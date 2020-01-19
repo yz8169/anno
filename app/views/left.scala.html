@@ -1,0 +1,68 @@
+@(id: String)
+<div class="page-sidebar-wrapper">
+	<div class="page-sidebar navbar-collapse collapse">
+		<ul class="page-sidebar-menu " data-auto-scroll="true" data-slide-speed="200" id="projects">
+
+			<li class="sidebar-toggler-wrapper">
+					<!-- BEGIN SIDEBAR TOGGLER BUTTON -->
+				<div class="sidebar-toggler">
+				</div>
+					<!-- END SIDEBAR TOGGLER BUTTON -->
+			</li>
+			<li style="height: 10px"></li>
+
+			@*<li id='splitData'>*@
+				@*<a href='@routes.LoadDataController.splitDataBefore()'>*@
+					@*<i class="fa fa-anchor"></i>*@
+					@*<span class='title'>拆分数据</span>*@
+					@*<span class='selected'></span>*@
+				@*</a>*@
+			@*</li>*@
+
+			<li id='loadData'>
+				<a href='@routes.LoadDataController.loadDataBefore()'>
+					<i class="fa fa-cloud-upload"></i>
+					<span class='title'>导入序列</span>
+					<span class='selected'></span>
+				</a>
+			</li>
+
+			<li id='sampleManage'>
+				<a href='@routes.SampleManageController.toIndex()'>
+					<i class='fa fa fa-bar-chart'></i>
+					<span class='title'>样品管理</span>
+					<span class='selected'></span>
+				</a>
+			</li>
+
+			<li id='anno'>
+				<a href='@routes.AnnoController.annoBefore()'>
+					<i class="fa fa-adjust"></i>
+					<span class='title'>运行注释</span>
+					<span class='selected'></span>
+				</a>
+			</li>
+
+			<li id='annoResult'>
+				<a href='@routes.AnnoController.annoResult()'>
+					<i class="fa fa-sliders"></i>
+					<span class='title'>注释结果</span>
+					<span class='selected'></span>
+				</a>
+			</li>
+
+
+		</ul>
+	</div>
+</div>
+
+<script>
+		$(function () {
+			var menuContainer = jQuery('.page-sidebar ul');
+			menuContainer.children('li.active').removeClass('active');
+			$("#" + "@id").addClass('active')
+
+
+		})
+
+</script>

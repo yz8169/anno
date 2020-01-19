@@ -1,0 +1,170 @@
+@()(implicit request: RequestHeader)
+	@main("导入序列")("loadData") {
+		<div class="page-content">
+
+			<div class="page-bar">
+				<ul class="page-breadcrumb">
+
+					<li>
+						<i class="fa fa-cloud-upload"></i>
+						<a href="#">导入序列</a>
+					</li>
+
+				</ul>
+			</div>
+
+
+			<div class="row-fluid">
+				<div class="row">
+					<div class="col-md-12 col-sm-12">
+						<div class="portlet blue-madison box">
+							<div class="portlet-title">
+								<div class="caption">
+									导入序列
+								</div>
+							</div>
+
+							<div class="portlet-body">
+
+								<form class="registration-form form-horizontal" id="form"
+								accept-charset="UTF-8" method="post">
+									<input name="projectId" value="" type="hidden">
+									<div class="form-group" id="pTree">
+										<label class="control-label col-sm-2">样品名:</label>
+										<div class="col-sm-3">
+											<input class="form-control" name="sampleName">
+										</div>
+									</div>
+
+									<div class="form-group">
+										<label class="control-label col-sm-2">描述:</label>
+										<div class="col-sm-6">
+											<textarea name="describe" id="describe" class="form-control" rows="5"></textarea>
+										</div>
+									</div>
+
+									<div class="form-group">
+										<label class="control-label col-sm-2">序列文件:</label>
+										<div class="col-sm-8">
+											<input id="input-1" type="file" class="file control-label" name="file" data-show-preview="false"
+											data-show-upload="false" accept=".fa,.fasta">
+										</div>
+									</div>
+
+
+									<div class="form-group">
+										<div class="actions col-sm-offset-2 col-sm-2">
+											<button type="button" class="btn btn-primary" style="width: 90%;" id="search" onclick="mySearch()">
+												运行</button>
+										</div>
+									</div>
+
+
+								</form>
+
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+
+		</div>
+
+
+		<script>
+				$(function () {
+					formValidation()
+
+				})
+
+				$("#input-1").fileinput({
+					showPreview: false,
+					browseLabel: "选择...",
+					removeLabel: "删除文件",
+					language: "zh"
+				});
+
+				function mySearch() {
+					var form = $("#form")
+					var fv = form.data("formValidation")
+					fv.validate()
+					if (fv.isValid()) {
+						var element = "<div id='content'><span id='info'>" + zhRunning + "</span>&nbsp;<img class='runningImage' src='@routes.Assets.at("images/running2.gif")' style='width: 30px;height: 20px;'></div>"
+						var index = layer.alert(element, {
+							skin: 'layui-layer-molv'
+							, closeBtn: 0,
+							title: zhInfo,
+							btn: []
+						});
+						var form1 = new FormData($("#form")[0])
+						$.ajax({
+							url: "@routes.LoadDataController.loadData()",
+							type: "post",
+							processData: false,
+							contentType: false,
+							data: form1,
+							success: function (data) {
+								layer.close(index)
+								if (data.valid == "false") {
+									swal("Error", data.message, "error")
+								} else {
+									swal("成功！", "导入数据成功！", "success")
+									window.location = "@routes.SampleManageController.toIndex()"
+								}
+							}
+						});
+					}
+				}
+
+
+				function formValidation() {
+					$('#form').formValidation({
+						framework: 'bootstrap',
+						icon: {
+							valid: 'glyphicon glyphicon-ok',
+							invalid: 'glyphicon glyphicon-remove',
+							validating: 'glyphicon glyphicon-refresh'
+						},
+						fields: {
+							sampleName: {
+								validators: {
+									notEmpty: {
+										message: '样品名不能为空!'
+									},
+									remote: {
+										message: "样品名已存在！",
+										url: "sampleNameCheck",
+										type: "post",
+										delay: 1000
+									}
+								}
+							},
+							describe: {
+								validators: {
+									notEmpty: {
+										message: '描述不能为空!'
+									}
+								}
+							},
+							file: {
+								validators: {
+									notEmpty: {
+										message: '请选择一个序列文件！'
+									},
+									file: {
+										extension: 'fa,fasta',
+										message: '请选择一个fasta格式的序列文件！'
+									}
+								}
+							},
+
+						}
+					});
+
+				}
+		</script>
+
+
+	}

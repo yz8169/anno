@@ -1,0 +1,43 @@
+@()(implicit messages:Messages, request: RequestHeader)
+@main("总览")("view") {
+	<div class="page-content">
+
+		<div class="page-bar">
+			<ul class="page-breadcrumb">
+				<li>
+					<i class="fa fa-tachometer"></i>
+					<a href="">总览</a>
+				</li>
+			</ul>
+		</div>
+
+		<div id="content">
+			<div class="error">@messages("error")</div>
+			<div class="error">have a try</div>
+
+
+		</div>
+
+	</div>
+
+
+	<script>
+
+			$(function () {
+				$.ajax({
+					url: "@routes.TestController.test1()",
+					type: "post",
+					contentType:"text/xml",
+					data:"<name>yz</name>",
+					success: function (data) {
+					}
+				});
+
+			})
+
+
+
+
+	</script>
+
+}

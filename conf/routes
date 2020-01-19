@@ -1,0 +1,45 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET         /                                               controllers.UserController.redirect2Index
+
+GET         /anno/test/test                                 controllers.TestController.test
+POST        /anno/test/test1                                controllers.TestController.test1
+
+GET         /anno/admin/delete                              controllers.UserController.delete(userId:Int)
+GET         /anno/admin/mock                                controllers.UserController.mock
+
+GET         /anno/user/loginBefore                          controllers.UserController.loginBefore
+GET         /anno/user/toIndex                              controllers.UserController.toIndex
+GET         /anno/user/logout                               controllers.UserController.logout
+GET         /anno/user/toHome                               controllers.UserController.toHome
+
+GET         /anno/user/sampleManage/toIndex                 controllers.SampleManageController.toIndex
+GET         /anno/user/sampleManage/getAllSample            controllers.SampleManageController.getAllSample
+GET         /anno/user/sampleManage/deleteSampleById        controllers.SampleManageController.deleteSampleById(id:Int)
+GET         /anno/user/sampleManage/getSampleById           controllers.SampleManageController.getSampleById(id:Int)
+POST        /anno/user/sampleManage/updateDescribe          controllers.SampleManageController.updateDescribe
+GET         /anno/user/sampleManage/switchKindById          controllers.SampleManageController.switchKindById(id:Int)
+
+
+GET         /anno/user/loadData/loadDataBefore              controllers.LoadDataController.loadDataBefore()
+POST        /anno/user/loadData/sampleNameCheck             controllers.LoadDataController.sampleNameCheck
+POST        /anno/user/loadData/loadData                    controllers.LoadDataController.loadData
+GET         /anno/user/loadData/splitDataBefore             controllers.LoadDataController.splitDataBefore()
+POST        /anno/user/loadData/splitData                   controllers.LoadDataController.splitData
+
+GET         /anno/user/anno/annoBefore                      controllers.AnnoController.annoBefore
+POST        /anno/user/anno/anno                            controllers.AnnoController.anno
+GET         /anno/user/anno/annoResult                      controllers.AnnoController.annoResult
+GET         /anno/user/anno/getAllMission                   controllers.AnnoController.getAllMission
+GET         /anno/user/anno/deleteMissionById               controllers.AnnoController.deleteMissionById(id:Int)
+GET         /anno/user/anno/updateMissionSocket             controllers.AnnoController.updateMissionSocket
+GET         /anno/user/anno/downloadResult                  controllers.AnnoController.downloadResult(missionId:Int)
+GET         /anno/user/anno/getLogContent                   controllers.AnnoController.getLogContent
+GET         /anno/user/anno/resultViewBefore                controllers.AnnoController.resultViewBefore(missionId:Int)
+GET         /anno/user/anno/downloadFile                    controllers.AnnoController.downloadFile
+
+# Map static resources from the /public folder to the /assets URL path
+GET         /assets/*file                                   controllers.Assets.at(path="/public", file)
